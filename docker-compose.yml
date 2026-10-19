@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8007:8007"
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_CHAT_MODEL: qwen2.5:7b
+      CORS_ORIGINS: http://localhost:3007
+      DATABASE_PATH: /data/briefsmith.db
+    volumes:
+      - briefsmith-data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE: http://localhost:8007
+    ports:
+      - "3007:80"
+    depends_on:
+      - backend
+
+volumes:
+  briefsmith-data:
