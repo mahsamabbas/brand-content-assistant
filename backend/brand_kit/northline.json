@@ -1,0 +1,22 @@
+{
+  "brand_name": "Northline Trail Co.",
+  "version": "northline-v1",
+  "voice": "Calm, practical, outdoorsy. Concrete trail benefits over hype. Inclusive and grounded.",
+  "do": [
+    "Name specific product benefits (weather, packability, repairability)",
+    "Speak to weekend hikers and daily commuters without jargon",
+    "Keep LinkedIn reflective; keep email personal and scannable"
+  ],
+  "dont": [
+    "Medical or performance guarantees",
+    "Fake urgency or invented discounts",
+    "Hashtag spam or emoji walls"
+  ],
+  "banned_phrases": [
+    "clinically proven",
+    "guaranteed results",
+    "limited time 90% off"
+  ],
+  "linkedin_max_chars": 1300,
+  "email_subject_max_chars": 90
+}
