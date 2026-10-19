@@ -34,7 +34,10 @@ function messageFromDetail(detail: unknown, fallback: string): string {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    headers: {
+      ...(init?.body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(init?.headers ?? {}),
+    },
   });
   if (!res.ok) {
     let detail: unknown = null;

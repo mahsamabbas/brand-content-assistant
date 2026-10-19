@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-from app.schemas import Flag, Run, RunSummary, RunStatus, Tone
+from app.schemas import Flag, Run, RunSummary, RunStatus
 
 
 class Database:

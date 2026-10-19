@@ -34,7 +34,7 @@ export default function App() {
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [approving, setApproving] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
-  const [flashKey, setFlashKey] = useState(0);
+  const [flash, setFlash] = useState<{ runId: string; n: number } | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [sampleLoading, setSampleLoading] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
@@ -44,6 +44,14 @@ export default function App() {
   const draftsRef = useRef<DraftFields | null>(null);
   const saveTimer = useRef<number | undefined>(undefined);
   const saveSeq = useRef(0);
+  const writeQueue = useRef<Promise<unknown>>(Promise.resolve());
+
+  // Serialize PATCH writes so a slow edit save can never land after (and overwrite) an approve.
+  const enqueue = useCallback(<T,>(fn: () => Promise<T>): Promise<T> => {
+    const p = writeQueue.current.then(fn, fn);
+    writeQueue.current = p.catch(() => undefined);
+    return p;
+  }, []);
 
   const applyRun = useCallback((next: Run | null) => {
     runRef.current = next;
@@ -94,8 +102,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [historyOpen]);
 
-  const persist = useCallback(async (): Promise<void> => {
-    window.clearTimeout(saveTimer.current);
+  const doPersist = useCallback(async (): Promise<void> => {
     const current = runRef.current;
     const d = draftsRef.current;
     if (!current || !d || sameDrafts(draftsOf(current), d)) return;
@@ -116,6 +123,11 @@ export default function App() {
       }
     }
   }, [applyRun]);
+
+  const persist = useCallback((): Promise<void> => {
+    window.clearTimeout(saveTimer.current);
+    return enqueue(doPersist);
+  }, [enqueue, doPersist]);
 
   function onDraftChange(field: keyof DraftFields, value: string) {
     if (!draftsRef.current) return;
@@ -186,24 +198,30 @@ export default function App() {
   }
 
   async function onApprove() {
-    const current = runRef.current;
-    const d = draftsRef.current;
-    if (!current || !d || !canApprove(d)) return;
+    if (!runRef.current || !draftsRef.current || !canApprove(draftsRef.current)) return;
     window.clearTimeout(saveTimer.current);
-    const seq = ++saveSeq.current;
     setApproving(true);
     setReviewError(null);
     try {
-      const updated = await api.patchRun(current.id, { ...d, status: "ready_not_published" });
-      if (runRef.current?.id !== updated.id) return;
-      applyRun(updated);
-      if (seq === saveSeq.current) setSaveState("idle");
-      setFlashKey((k) => k + 1);
-      setRuns((rs) => rs.map((r) => (r.id === updated.id ? { ...r, status: updated.status } : r)));
-    } catch (e) {
-      const flags = e instanceof ApiError ? flagsFromDetail(e.detail) : null;
-      if (flags && runRef.current?.id === current.id) applyRun({ ...current, flags });
-      setReviewError(describeError(e));
+      // Runs after any in-flight edit save has settled; reads latest run/drafts at that point.
+      await enqueue(async () => {
+        const current = runRef.current;
+        const d = draftsRef.current;
+        if (!current || !d || !canApprove(d)) return;
+        const seq = ++saveSeq.current;
+        try {
+          const updated = await api.patchRun(current.id, { ...d, status: "ready_not_published" });
+          if (runRef.current?.id !== updated.id) return;
+          applyRun(updated);
+          if (seq === saveSeq.current) setSaveState("idle");
+          setFlash((f) => ({ runId: updated.id, n: (f?.n ?? 0) + 1 }));
+          setRuns((rs) => rs.map((r) => (r.id === updated.id ? { ...r, status: updated.status } : r)));
+        } catch (e) {
+          const flags = e instanceof ApiError ? flagsFromDetail(e.detail) : null;
+          if (flags && runRef.current?.id === current.id) applyRun({ ...runRef.current, flags });
+          setReviewError(describeError(e));
+        }
+      });
     } finally {
       setApproving(false);
     }
@@ -280,7 +298,8 @@ export default function App() {
           approving={approving}
           generating={generating}
           saveState={saveState}
-          flashKey={flashKey}
+          flashRunId={flash?.runId ?? null}
+          flashKey={flash?.n ?? 0}
           flagCount={run?.flags.length ?? 0}
           error={reviewError}
           onApprove={onApprove}

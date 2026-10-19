@@ -12,6 +12,7 @@ interface Props {
   approving: boolean;
   generating: boolean;
   saveState: SaveState;
+  flashRunId: string | null;
   flashKey: number;
   flagCount: number;
   error: string | null;
@@ -35,6 +36,7 @@ export default function ReviewBar({
   approving,
   generating,
   saveState,
+  flashRunId,
   flashKey,
   flagCount,
   error,
@@ -72,7 +74,7 @@ export default function ReviewBar({
         {run && (
           <span
             key={`${run.id}:${flashKey}`}
-            className={`status-badge${ready && flashKey > 0 ? " approve-flash" : ""}`}
+            className={`status-badge${ready && flashKey > 0 && flashRunId === run.id ? " approve-flash" : ""}`}
             data-status={run.status}
           >
             {statusLabel(run.status)}
