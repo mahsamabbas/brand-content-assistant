@@ -53,6 +53,8 @@ export interface Run {
   brand_kit_version: string;
 }
 
+export type DraftFields = Pick<Run, "linkedin_post" | "email_subject" | "email_body">;
+
 export interface RunSummary {
   id: string;
   brief_snippet: string;
