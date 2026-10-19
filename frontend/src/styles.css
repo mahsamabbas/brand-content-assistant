@@ -1,0 +1,340 @@
+@import "tailwindcss";
+
+/* Briefsmith — trail-atelier design system */
+
+@theme {
+  --color-ink: #1a2421;
+  --color-moss: #2f6f5e;
+  --color-fog: #e8eee9;
+  --color-sand: #f3efe6;
+  --color-clay: #c45c26;
+
+  --font-display: "Syne", "Helvetica Neue", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-ui: "Figtree", "Helvetica Neue", sans-serif;
+}
+
+:root {
+  --ink: #1a2421;
+  --moss: #2f6f5e;
+  --fog: #e8eee9;
+  --sand: #f3efe6;
+  --clay: #c45c26;
+
+  --ink-soft: color-mix(in srgb, var(--ink) 72%, var(--fog));
+  --rule: color-mix(in srgb, var(--ink) 14%, transparent);
+  --moss-wash: color-mix(in srgb, var(--moss) 14%, transparent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--fog);
+  /* Mist wash + topographic contour suggestion, CSS only */
+  background-image:
+    radial-gradient(1200px 700px at 12% -10%, color-mix(in srgb, var(--moss) 22%, transparent), transparent 62%),
+    radial-gradient(900px 600px at 95% 8%, color-mix(in srgb, var(--sand) 90%, transparent), transparent 60%),
+    radial-gradient(1000px 800px at 70% 110%, color-mix(in srgb, var(--moss) 16%, transparent), transparent 65%),
+    repeating-radial-gradient(
+      circle at 28% 118%,
+      transparent 0 34px,
+      color-mix(in srgb, var(--ink) 5%, transparent) 34px 35px
+    ),
+    repeating-radial-gradient(
+      circle at 82% -14%,
+      transparent 0 46px,
+      color-mix(in srgb, var(--moss) 7%, transparent) 46px 47px
+    ),
+    linear-gradient(168deg, var(--fog) 0%, var(--sand) 100%);
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--moss);
+  outline-offset: 2px;
+}
+
+/* ---------- Typography roles ---------- */
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--ink);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.kit-voice {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.kit-voice::before {
+  content: "\201C";
+}
+.kit-voice::after {
+  content: "\201D";
+}
+
+.draft-copy {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ---------- Surfaces ---------- */
+
+.rail {
+  background: color-mix(in srgb, var(--sand) 78%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--rule);
+}
+
+.postcard,
+.letter {
+  background: var(--sand);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1px 0 var(--rule), 0 18px 40px -26px color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.postcard {
+  border-radius: 4px 4px 14px 4px;
+}
+
+.letter {
+  border-radius: 2px;
+  background-image: linear-gradient(to bottom, transparent 31px, var(--rule) 32px);
+  background-size: 100% 32px;
+  background-color: var(--sand);
+}
+
+/* ---------- Controls ---------- */
+
+.btn-moss {
+  background: var(--moss);
+  color: var(--sand);
+  border: 0;
+  border-radius: 3px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.btn-moss:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--moss) 86%, var(--ink));
+}
+.btn-moss:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn-moss:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.55rem 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--moss);
+  color: var(--moss);
+}
+
+/* Signal clay: approve CTA only */
+.btn-approve {
+  background: var(--clay);
+  color: var(--sand);
+  border: 0;
+  border-radius: 3px;
+  padding: 0.7rem 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 160ms ease;
+}
+.btn-approve:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+.btn-approve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.field {
+  width: 100%;
+  background: color-mix(in srgb, var(--fog) 55%, var(--sand));
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.6rem 0.75rem;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--moss);
+  box-shadow: 0 0 0 3px var(--moss-wash);
+}
+
+/* ---------- Status badge ---------- */
+
+.status-badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  border: 1px solid var(--rule);
+  background: var(--fog);
+  color: var(--ink);
+  transition: background 320ms ease, color 320ms ease, border-color 320ms ease;
+}
+.status-badge[data-status="ready_not_published"] {
+  background: var(--ink);
+  color: var(--sand);
+  border-color: var(--ink);
+}
+
+/* ---------- Grain overlay (~4%) ---------- */
+
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- Motion ---------- */
+
+/* 1. Generate: moss pulse on draft panes */
+@keyframes draft-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--moss) 0%, transparent), inset 0 0 0 1px var(--rule);
+    background-color: var(--sand);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--moss) 18%, transparent), inset 0 0 0 1px var(--moss);
+    background-color: color-mix(in srgb, var(--moss) 8%, var(--sand));
+  }
+}
+.draft-pulse {
+  animation: draft-pulse 1.6s ease-in-out infinite;
+}
+
+/* 2. Flags: slide-in strip */
+@keyframes flag-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.flag-enter {
+  animation: flag-enter 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* 3. Approve: brief moss → clay border flash + ink flash on badge */
+@keyframes approve-flash {
+  0% {
+    border-color: var(--moss);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--moss) 50%, transparent);
+  }
+  45% {
+    border-color: var(--clay);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--clay) 28%, transparent);
+  }
+  100% {
+    border-color: var(--rule);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.approve-flash {
+  animation: approve-flash 900ms ease-out 1;
+}
+
+@keyframes ink-flash {
+  0% {
+    background: var(--sand);
+    color: var(--ink);
+  }
+  100% {
+    background: var(--ink);
+    color: var(--sand);
+  }
+}
+.status-badge.approve-flash {
+  animation: approve-flash 900ms ease-out 1, ink-flash 420ms ease-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draft-pulse,
+  .flag-enter,
+  .approve-flash,
+  .status-badge.approve-flash {
+    animation: none;
+  }
+}
