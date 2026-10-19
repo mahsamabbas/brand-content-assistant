@@ -76,3 +76,20 @@ def test_generate_ollama_failure(tmp_path, kit):
             client=client,
         )
     assert ei.value.status_code == 503
+
+
+def test_generate_non_object_json_502(tmp_path, kit):
+    from app.ollama_client import OllamaError
+
+    db = Database(str(tmp_path / "t.db"))
+    db.init()
+    client = MagicMock()
+    client.chat_json.side_effect = OllamaError("invalid json after repair")
+    with pytest.raises(GenerateError) as ei:
+        generate_run(
+            GenerateRequest(brief="Announce", audience="Hikers", tone="calm"),
+            kit=kit,
+            db=db,
+            client=client,
+        )
+    assert ei.value.status_code == 502

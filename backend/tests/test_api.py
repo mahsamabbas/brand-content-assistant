@@ -22,7 +22,52 @@ def test_brand_kit_and_sample(client):
 
 def test_generate_empty_brief_400(client):
     r = client.post("/generate", json={"brief": "  ", "audience": "Hikers", "tone": "calm"})
-    assert r.status_code == 422 or r.status_code == 400
+    assert r.status_code == 400
+
+
+def test_generate_missing_brief_400(client):
+    r = client.post("/generate", json={"audience": "Hikers", "tone": "calm"})
+    assert r.status_code == 400
+    assert isinstance(r.json()["detail"]["message"], str)
+
+
+def test_generate_empty_string_brief_400(client):
+    r = client.post("/generate", json={"brief": "", "audience": "Hikers", "tone": "calm"})
+    assert r.status_code == 400
+
+
+def test_generate_invalid_tone_400(client):
+    r = client.post("/generate", json={"brief": "Announce", "audience": "Hikers", "tone": "sarcastic"})
+    assert r.status_code == 400
+
+
+def test_patch_invalid_status_400(client, monkeypatch):
+    mock = MagicMock()
+    mock.chat_json.return_value = {"linkedin_post": "P", "email_subject": "S", "email_body": "B"}
+    monkeypatch.setattr("app.routes.get_ollama", lambda: mock)
+    run = client.post(
+        "/generate", json={"brief": "Announce", "audience": "Hikers", "tone": "calm"}
+    ).json()
+    r = client.patch(f"/runs/{run['id']}", json={"status": "published"})
+    assert r.status_code == 400
+
+
+def test_generate_non_object_json_502(client, monkeypatch):
+    import httpx
+
+    from app.config import get_settings
+    from app.ollama_client import OllamaClient
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"message": {"content": "[1, 2, 3]"}})
+
+    http = httpx.Client(base_url="http://ollama.test", transport=httpx.MockTransport(handler))
+    real = OllamaClient(get_settings(), client=http)
+    monkeypatch.setattr("app.routes.get_ollama", lambda: real)
+    r = client.post(
+        "/generate", json={"brief": "Announce", "audience": "Hikers", "tone": "calm"}
+    )
+    assert r.status_code == 502
 
 
 def test_generate_success(client, monkeypatch):

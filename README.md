@@ -26,6 +26,8 @@ Everything runs locally: the LLM is a local [Ollama](https://ollama.com) model �
 | `GET` | `/runs/{id}` | Full run |
 | `PATCH` | `/runs/{id}` | Edit drafts and/or set `status` to `ready_not_published` |
 
+Invalid request bodies (empty brief/audience, unknown tone or status) return `400` with `detail.message`.
+
 `POST /generate` errors: `400` invalid input, `503` Ollama unreachable/timeout, `502` unparseable model output after one repair retry. `PATCH` errors: `404` unknown run, `400` approving empty drafts.
 
 ## Environment
@@ -76,6 +78,10 @@ npm run dev -- --port 3007
 
 Open http://localhost:3007.
 
+## Demo
+
+To capture a screenshot of the main flow: start the stack (Docker or local), open http://localhost:3007, and from the **EmptyDesk** state click **Use sample brief** → **Generate** → edit if desired → **Approve** (status becomes `ready_not_published`). Screenshots can be added under `docs/` later (e.g. `docs/screenshots/`); none are committed yet.
+
 ## Tests
 
 ```bash
@@ -85,6 +91,13 @@ cd backend && source .venv/bin/activate && pytest
 # Frontend
 cd frontend && npm test
 ```
+
+### Test results
+
+Latest run (2026-10-19):
+
+- Backend `pytest`: **26 passed**
+- Frontend `vitest`: **8 passed** (3 files)
 
 ## Limitations
 
